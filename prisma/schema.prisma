@@ -16,8 +16,46 @@ model User {
   password   String       @db.VarChar(255)
   createdAt  DateTime     @default(now())
   updatedAt  DateTime     @updatedAt
-  FirstIdea   FirstIdea[]  
+  FirstIdea  FirstIdea[] 
+  Project    Project[]
 }
+
+model Project {
+    id        Int      @id @default(autoincrement())
+    User      User     @relation(fields: [userId], references: [id],  onDelete: Cascade)
+    userId    Int
+    objective String
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
+    Element  Element[]
+}
+
+model Element {
+    id        Int      @id @default(autoincrement())
+    Project   Project     @relation(fields: [projectId], references: [id],  onDelete: Cascade)
+    projectId    Int
+    Type      ElementType
+    Property Property[]
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+}
+
+enum ElementType {
+  Arrow
+  Box
+  Text
+  Line
+}
+model Property {
+    id        Int      @id @default(autoincrement())
+    name    String
+    value   String
+    Element Element[]
+    createdAt  DateTime     @default(now())
+    updatedAt  DateTime     @updatedAt
+}
+
+
 
 model FirstIdea {
     id        Int      @id @default(autoincrement())
