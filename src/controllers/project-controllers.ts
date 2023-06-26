@@ -7,15 +7,16 @@ type bodyCreateOrUpdateProject = {
   id?: string | number;
   objective: string;
   name: string;
+  imageURL?: string | null;
 };
 
 export async function createOrUpdateProject(req: Request, res: AuthorizedResponse, next: NextFunction) {
-  const { objective, name } = req.body as bodyCreateOrUpdateProject;
+  const { objective, name, imageURL } = req.body as bodyCreateOrUpdateProject;
   const id = parseInt(req.body.id);
   const userId = res.locals.userId;
   try {
-    await projectService.createProject({ objective, name, id, userId });
-    res.sendStatus(httpStatus.CREATED);
+    const project = await projectService.createProject({ objective, name, id, userId, imageURL });
+    res.send(project).status(httpStatus.CREATED);
   } catch (error) {
     next(error);
   }
@@ -43,7 +44,7 @@ export async function getAllProjects(req: Request, res: AuthorizedResponse, next
 }
 
 export async function deleteProject(req: Request, res: AuthorizedResponse, next: NextFunction) {
-  const { id } = req.body as { id: string };
+  const { id } = req.params as { id: string };
   const userId = res.locals.userId;
   try {
     await projectService.deleteProject(parseInt(id), userId);
