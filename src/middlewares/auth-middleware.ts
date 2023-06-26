@@ -28,6 +28,12 @@ export function AuthMiddleware(req: Request, res: Response, next: NextFunction) 
   });
 }
 
+type userId = {
+  userId: number;
+};
+
+export type AuthorizedResponse = Response & { locals: userId };
+
 function generateUnauthorizedResponse(res: Response) {
   res.status(httpStatus.UNAUTHORIZED).send(unauthorizedError());
 }
