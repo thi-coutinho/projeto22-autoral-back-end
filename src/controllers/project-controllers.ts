@@ -2,6 +2,7 @@ import { NextFunction, Request } from 'express';
 import httpStatus from 'http-status';
 import { AuthorizedResponse } from '@/middlewares/auth-middleware';
 import projectService from '@/services/project-service';
+import { ElementsCreateInput } from '@/schemas';
 
 type bodyCreateOrUpdateProject = {
   id?: string | number;
@@ -49,6 +50,17 @@ export async function deleteProject(req: Request, res: AuthorizedResponse, next:
   try {
     await projectService.deleteProject(parseInt(id), userId);
     res.sendStatus(httpStatus.OK);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function createElements(req: Request, res: AuthorizedResponse, next: NextFunction) {
+  const data = req.body as ElementsCreateInput;
+  const userId = res.locals.userId;
+  try {
+    const elementsCreated = await projectService.createElements(data, userId);
+    res.send(elementsCreated).status(httpStatus.CREATED);
   } catch (error) {
     next(error);
   }

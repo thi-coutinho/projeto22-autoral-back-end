@@ -1,6 +1,8 @@
 import { Project, Prisma } from '@prisma/client';
 import projectRepository from '@/repositories/project-repository';
 import { forBiddenError } from '@/errors';
+import { badRequestError } from '@/errors/bad-request-error';
+import { ElementsCreateInput } from '@/schemas';
 
 export async function createProject(project: Prisma.ProjectUncheckedCreateWithoutElementInput): Promise<Project> {
   if (project.id) await checkOwnerProject(project.id, project.userId);
@@ -9,6 +11,7 @@ export async function createProject(project: Prisma.ProjectUncheckedCreateWithou
 
 async function checkOwnerProject(id: number, userId: number) {
   const project = await projectRepository.findById(id);
+  if (!project) throw badRequestError('project doesn`t exist');
   if (project.userId !== userId) throw forBiddenError();
 }
 
@@ -28,11 +31,18 @@ async function getAllProjects(userId: number) {
   return projectAllElements;
 }
 
+async function createElements(data: ElementsCreateInput, userId: number) {
+  await checkOwnerProject(data.projectId, userId);
+  const elementsCreated = await projectRepository.createManyElements(data);
+  return elementsCreated;
+}
+
 const projectService = {
   createProject,
   deleteProject,
   getAllElements,
   getAllProjects,
+  createElements,
 };
 
 export default projectService;

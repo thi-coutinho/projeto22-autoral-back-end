@@ -5,5 +5,5 @@ export const createOrUpdateProjectSchema = Joi.object<Prisma.ProjectUncheckedCre
   name: Joi.string().min(3).required(),
   objective: Joi.string().min(3),
   imageURL: Joi.string().uri(),
-  id: Joi.string(),
+  id: Joi.number().integer().positive(),
 });
